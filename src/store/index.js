@@ -40,6 +40,22 @@ export default createStore({
       context.commit('UPDATE_USER', { id: payload.email });
       return api.post(`/usuario`, payload);
     },
+
+    userLogout(context) {
+      context.commit('UPDATE_USER', {
+        id: '',
+        nome: '',
+        email: '',
+        senha: '',
+        cep: '',
+        rua: '',
+        numero: '',
+        bairro: '',
+        cidade: '',
+        estado: '',
+      });
+      context.commit('UPDATE_LOGIN', false);
+    },
   },
   modules: {},
 });
