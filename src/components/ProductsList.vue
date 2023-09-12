@@ -1,31 +1,41 @@
 <template>
   <section class="produtos-container">
-    <div v-if="products && products.length" class="produtos">
-      <div class="produto" v-for="(product, index) in products" :key="index">
-        <RouterLink to="/">
-          <img
-            v-if="product.fotos"
-            :src="product.fotos[0].src"
-            :alt="product.fotos[0].titulo"
-          />
-          <p class="preco">{{ product.preco }}</p>
-          <h2 class="titulo">{{ product.nome }}</h2>
-          <p>{{ product.descricao }}</p>
-        </RouterLink>
+    <Transition mode="out-in">
+      <div v-if="products && products.length" class="produtos" key="products">
+        <div class="produto" v-for="(product, index) in products" :key="index">
+          <RouterLink to="/">
+            <img
+              v-if="product.fotos"
+              :src="product.fotos[0].src"
+              :alt="product.fotos[0].titulo"
+            />
+            <p class="preco">{{ product.preco }}</p>
+            <h2 class="titulo">{{ product.nome }}</h2>
+            <p>{{ product.descricao }}</p>
+          </RouterLink>
+        </div>
+        <ProductsPagination
+          :totalProducts="productsTotal"
+          :productsPerPage="productsPerPage"
+        />
       </div>
-      <ProductsPagination
-        :totalProducts="productsTotal"
-        :productsPerPage="productsPerPage"
-      />
-    </div>
-    <div v-else-if="products && products.length === 0" class="sem-resultados">
-      <p>Busca sem resultados. Tente buscar outro termo</p>
-    </div>
+
+      <div
+        v-else-if="products && products.length === 0"
+        class="sem-resultados"
+        key="no-results"
+      >
+        <p>Busca sem resultados. Tente buscar outro termo</p>
+      </div>
+
+      <PageLoading v-else key="loading" />
+    </Transition>
   </section>
 </template>
 
 <script>
 import ProductsPagination from '@/components/ProductsPagination.vue';
+import PageLoading from './PageLoading.vue';
 import { ref, computed, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { api } from '@/services.js';
@@ -35,12 +45,13 @@ export default {
   name: 'ProductsList',
   components: {
     ProductsPagination,
+    PageLoading,
   },
 
   setup() {
     const route = useRoute();
     const products = ref([]);
-    const productsPerPage = ref(4);
+    const productsPerPage = ref(9);
     const productsTotal = ref(0);
 
     const url = computed(() => {
@@ -50,10 +61,13 @@ export default {
     });
 
     const getProdutos = () => {
-      api.get(url.value).then((response) => {
-        productsTotal.value = Number(response.headers['x-total-count']);
-        products.value = response.data;
-      });
+      products.value = null;
+      setTimeout(() => {
+        api.get(url.value).then((response) => {
+          productsTotal.value = Number(response.headers['x-total-count']);
+          products.value = response.data;
+        });
+      }, 1500);
     };
 
     getProdutos();
