@@ -17,6 +17,7 @@ export default createStore({
       cidade: '',
       estado: '',
     },
+    usuario_produtos: null,
   },
   getters: {},
   mutations: {
@@ -26,6 +27,12 @@ export default createStore({
 
     UPDATE_USER(state, payload) {
       state.usuario = Object.assign(state.usuario, payload);
+    },
+    UPDATE_USER_PRODUCTS(state, payload) {
+      state.usuario_produtos = payload;
+    },
+    ADD_USER_PRODUCTS(state, payload) {
+      state.usuario_produtos.unshift(payload);
     },
   },
   actions: {
@@ -39,6 +46,14 @@ export default createStore({
     createUser(context, payload) {
       context.commit('UPDATE_USER', { id: payload.email });
       return api.post(`/usuario`, payload);
+    },
+
+    getUsuarioProdutos(context) {
+      api
+        .get(`/produto?usuario_id=${context.state.usuario.id}`)
+        .then((response) =>
+          context.commit('UPDATE_USER_PRODUCTS', response.data)
+        );
     },
 
     userLogout(context) {
