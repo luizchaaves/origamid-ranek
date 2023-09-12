@@ -2,7 +2,11 @@
   <div id="app">
     <TheHeader />
     <main id="main">
-      <router-view />
+      <router-view v-slot="{ Component }">
+        <Transition mode="out-in">
+          <component :is="Component" />
+        </Transition>
+      </router-view>
     </main>
     <TheFooter />
   </div>
