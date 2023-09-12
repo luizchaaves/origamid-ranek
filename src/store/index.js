@@ -2,6 +2,7 @@ import { createStore } from 'vuex';
 import { api } from '@/services';
 
 export default createStore({
+  strict: true,
   state: {
     login: false,
     usuario: {
@@ -24,15 +25,20 @@ export default createStore({
     },
 
     UPDATE_USER(state, payload) {
-      state.usuario = payload;
+      state.usuario = Object.assign(state.usuario, payload);
     },
   },
   actions: {
     getUsuario(context, payload) {
-      api.get(`/usuario/${payload}`).then((response) => {
+      return api.get(`/usuario/${payload}`).then((response) => {
         context.commit('UPDATE_USER', response.data);
         context.commit('UPDATE_LOGIN', true);
       });
+    },
+
+    createUser(context, payload) {
+      context.commit('UPDATE_USER', { id: payload.email });
+      return api.post(`/usuario`, payload);
     },
   },
   modules: {},
