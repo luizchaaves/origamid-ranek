@@ -14,18 +14,28 @@
 </template>
 
 <script>
-import { ref } from 'vue';
+import { ref, computed, watch } from 'vue';
+import { useRoute } from 'vue-router';
 import { api } from '@/services.js';
+import { serialize } from '@/helpers.js';
 
 export default {
   setup() {
+    const route = useRoute();
     const produtos = ref([]);
+    const productsPerPage = ref(9);
+
+    const url = computed(() => {
+      const query = serialize(route.query);
+
+      return `/produto?_limit=${productsPerPage.value}${query}`;
+    });
 
     const getProdutos = () => {
-      api.get('/produto').then((response) => (produtos.value = response.data));
+      api.get(url.value).then((response) => (produtos.value = response.data));
     };
 
-    getProdutos();
+    watch(url, () => getProdutos());
 
     return {
       produtos,
