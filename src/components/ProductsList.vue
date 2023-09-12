@@ -1,36 +1,47 @@
 <template>
   <section class="produtos-container">
-    <div v-if="produtos && produtos.length" class="produtos">
-      <div class="produto" v-for="produto in produtos" :key="produto.id">
+    <div v-if="products && products.length" class="produtos">
+      <div class="produto" v-for="(product, index) in products" :key="index">
         <RouterLink to="/">
           <img
-            v-if="produto.fotos"
-            :src="produto.fotos[0].src"
-            :alt="produto.fotos[0].titulo"
+            v-if="product.fotos"
+            :src="product.fotos[0].src"
+            :alt="product.fotos[0].titulo"
           />
-          <p class="preco">{{ produto.preco }}</p>
-          <h2 class="titulo">{{ produto.nome }}</h2>
-          <p>{{ produto.descricao }}</p>
+          <p class="preco">{{ product.preco }}</p>
+          <h2 class="titulo">{{ product.nome }}</h2>
+          <p>{{ product.descricao }}</p>
         </RouterLink>
       </div>
+      <ProductsPagination
+        :totalProducts="productsTotal"
+        :productsPerPage="productsPerPage"
+      />
     </div>
-    <div v-else-if="produtos && produtos.length === 0" class="sem-resultados">
+    <div v-else-if="products && products.length === 0" class="sem-resultados">
       <p>Busca sem resultados. Tente buscar outro termo</p>
     </div>
   </section>
 </template>
 
 <script>
+import ProductsPagination from '@/components/ProductsPagination.vue';
 import { ref, computed, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { api } from '@/services.js';
 import { serialize } from '@/helpers.js';
 
 export default {
+  name: 'ProductsList',
+  components: {
+    ProductsPagination,
+  },
+
   setup() {
     const route = useRoute();
-    const produtos = ref([]);
-    const productsPerPage = ref(9);
+    const products = ref([]);
+    const productsPerPage = ref(4);
+    const productsTotal = ref(0);
 
     const url = computed(() => {
       const query = serialize(route.query);
@@ -39,13 +50,20 @@ export default {
     });
 
     const getProdutos = () => {
-      api.get(url.value).then((response) => (produtos.value = response.data));
+      api.get(url.value).then((response) => {
+        productsTotal.value = Number(response.headers['x-total-count']);
+        products.value = response.data;
+      });
     };
+
+    getProdutos();
 
     watch(url, () => getProdutos());
 
     return {
-      produtos,
+      products,
+      productsPerPage,
+      productsTotal,
     };
   },
 };
