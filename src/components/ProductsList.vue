@@ -3,13 +3,13 @@
     <Transition mode="out-in">
       <div v-if="products && products.length" class="produtos" key="products">
         <div class="produto" v-for="(product, index) in products" :key="index">
-          <RouterLink to="/">
+          <RouterLink :to="{ name: 'product', params: { id: product.id } }">
             <img
               v-if="product.fotos"
               :src="product.fotos[0].src"
               :alt="product.fotos[0].titulo"
             />
-            <p class="preco">{{ product.preco }}</p>
+            <p class="preco">{{ $filters.formatPrice(product.preco) }}</p>
             <h2 class="titulo">{{ product.nome }}</h2>
             <p>{{ product.descricao }}</p>
           </RouterLink>
