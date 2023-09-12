@@ -20,6 +20,8 @@
 <script>
 import LoginCreate from '@/components/LoginCreate.vue';
 import { ref } from 'vue';
+import { useStore } from 'vuex';
+import { useRouter } from 'vue-router';
 
 export default {
   name: 'LoginView',
@@ -28,13 +30,17 @@ export default {
   },
 
   setup() {
+    const store = useStore();
+    const router = useRouter();
+
     const login = ref({
       email: '',
       senha: '',
     });
 
     const logar = () => {
-      return;
+      store.dispatch('getUsuario', login.value.email);
+      router.push({ name: 'user' });
     };
 
     return {
