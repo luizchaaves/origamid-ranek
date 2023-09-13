@@ -10,7 +10,13 @@
         <h1>{{ product.nome }}</h1>
         <p class="preco">{{ $filters.formatPrice(product.preco) }}</p>
         <p class="descricao">{{ product.descricao }}</p>
-        <button v-if="product.vendido === 'false'" class="btn">Comprar</button>
+        <Transition mode="out-in" v-if="product.vendido === 'false'">
+          <button v-if="!finalizar" class="btn" @click="finalizar = true">
+            Comprar
+          </button>
+          <FinalizePurchase v-else :produto="product" />
+        </Transition>
+
         <button v-else disabled class="btn">Produto Vendido</button>
       </div>
     </div>
@@ -21,6 +27,7 @@
 
 <script>
 import PageLoading from '@/components/PageLoading.vue';
+import FinalizePurchase from '@/components/FinalizePurchase.vue';
 import { api } from '../services';
 import { ref } from 'vue';
 
@@ -29,10 +36,12 @@ export default {
   props: ['id'],
   components: {
     PageLoading,
+    FinalizePurchase,
   },
 
   setup(props) {
     const product = ref(null);
+    const finalizar = ref(false);
 
     const getProduct = () => {
       api.get(`/produto/${props.id}`).then((response) => {
@@ -42,7 +51,7 @@ export default {
 
     getProduct();
 
-    return { product };
+    return { product, finalizar };
   },
 };
 </script>
