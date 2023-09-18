@@ -1,7 +1,7 @@
 <template>
   <section>
+    <h2>Compras</h2>
     <div v-if="compras">
-      <h2>Compras</h2>
       <div
         class="produto-wrapper"
         v-for="(compra, index) in compras"
@@ -33,12 +33,11 @@ export default {
     const store = useStore();
 
     const compras = ref(null);
-    const usuario = computed(() => store.state.usuario);
     const login = computed(() => store.state.login);
 
     const getCompras = () => {
       api
-        .get(`/transacao?comprador_id=${usuario.value.id}`)
+        .get(`/transacao?tipo=comprador_id`)
         .then((response) => (compras.value = response.data));
     };
 

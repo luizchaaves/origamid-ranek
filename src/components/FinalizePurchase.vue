@@ -47,7 +47,7 @@ export default {
       };
     });
 
-    const criarTransacao = () => {
+    const criarTransacao = async () => {
       return api
         .post('/transacao', compra.value)
         .then(() => router.push({ name: 'purchases' }));
@@ -56,7 +56,8 @@ export default {
     const criarUsuario = async () => {
       try {
         await store.dispatch('createUser', store.state.usuario);
-        await store.dispatch('getUsuario', store.state.usuario.email);
+        await store.dispatch('userLogin', store.state.usuario);
+        await store.dispatch('getUsuario');
         await criarTransacao();
       } catch (error) {
         console.log(error);

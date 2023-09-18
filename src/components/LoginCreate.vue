@@ -35,7 +35,8 @@ export default {
     const criarUsuario = async () => {
       try {
         await store.dispatch('createUser', store.state.usuario);
-        await store.dispatch('getUsuario', store.state.usuario.email);
+        await store.dispatch('userLogin', store.state.usuario);
+        await store.dispatch('getUsuario');
         router.push({ name: 'user' });
       } catch (error) {
         console.log(error);

@@ -38,9 +38,10 @@ export default {
       senha: '',
     });
 
-    const logar = () => {
-      store.dispatch('getUsuario', login.value.email);
-      router.push({ name: 'user' });
+    const logar = async () => {
+      await store.dispatch('userLogin', login.value);
+      await store.dispatch('getUsuario');
+      await router.push({ name: 'user' });
     };
 
     return {

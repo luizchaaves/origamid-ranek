@@ -36,8 +36,8 @@ export default createStore({
     },
   },
   actions: {
-    getUsuario(context, payload) {
-      return api.get(`/usuario/${payload}`).then((response) => {
+    async getUsuario(context) {
+      return api.get(`/usuario`).then((response) => {
         context.commit('UPDATE_USER', response.data);
         context.commit('UPDATE_LOGIN', true);
       });
@@ -56,6 +56,17 @@ export default createStore({
         );
     },
 
+    async userLogin(context, payload) {
+      return api
+        .login({
+          username: payload.email,
+          password: payload.senha,
+        })
+        .then((response) => {
+          window.localStorage.token = `Bearer ${response.data.token}`;
+        });
+    },
+
     userLogout(context) {
       context.commit('UPDATE_USER', {
         id: '',
@@ -69,6 +80,7 @@ export default createStore({
         cidade: '',
         estado: '',
       });
+      window.localStorage.removeItem('token');
       context.commit('UPDATE_LOGIN', false);
     },
   },

@@ -22,7 +22,7 @@ export default {
 
     const atualizarUsuario = () => {
       api
-        .put(`/usuario/${store.state.usuario.id}`, store.state.usuario)
+        .put('/usuario', store.state.usuario)
         .then(() => {
           store.dispatch('getUsuario', store.state.usuario.id);
           router.push({ name: 'user' });
