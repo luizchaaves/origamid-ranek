@@ -7,10 +7,15 @@
       <label for="senha">Senha</label>
       <input type="password" name="senha" id="senha" v-model="login.senha" />
       <button class="btn" @click.prevent="logar">Logar</button>
+      <ErrorNotification :errors="errors" />
     </form>
 
     <p class="perdeu">
-      <a href="/" target="_blank">Predeu a senha? Clique aqui.</a>
+      <a
+        href="http://ranekapi.local/wp-login.php?action=lostpassword"
+        target="_blank"
+        >Predeu a senha? Clique aqui.</a
+      >
     </p>
 
     <LoginCreate />
@@ -22,11 +27,13 @@ import LoginCreate from '@/components/LoginCreate.vue';
 import { ref } from 'vue';
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
+import ErrorNotification from '@/components/ErrorNotification.vue';
 
 export default {
   name: 'LoginView',
   components: {
     LoginCreate,
+    ErrorNotification,
   },
 
   setup() {
@@ -38,15 +45,23 @@ export default {
       senha: '',
     });
 
+    const errors = ref([]);
+
     const logar = async () => {
-      await store.dispatch('userLogin', login.value);
-      await store.dispatch('getUsuario');
-      await router.push({ name: 'user' });
+      errors.value = [];
+      try {
+        await store.dispatch('userLogin', login.value);
+        await store.dispatch('getUsuario');
+        await router.push({ name: 'user' });
+      } catch (error) {
+        errors.value.push(error.response.data.message);
+      }
     };
 
     return {
       login,
       logar,
+      errors,
     };
   },
 };

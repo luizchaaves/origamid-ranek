@@ -1,6 +1,7 @@
 <template>
   <section>
     <h2>Crie a sua conta</h2>
+    <ErrorNotification :errors="errors" />
     <Transition mode="out-in">
       <button v-if="!criar" class="btn" @click="criar = true">
         Criar conta
@@ -19,11 +20,13 @@ import UserForm from '@/components/UserForm.vue';
 import { ref } from 'vue';
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
+import ErrorNotification from './ErrorNotification.vue';
 
 export default {
   name: 'LoginCreate',
   components: {
     UserForm,
+    ErrorNotification,
   },
 
   setup() {
@@ -31,21 +34,24 @@ export default {
     const router = useRouter();
 
     const criar = ref(false);
+    const errors = ref([]);
 
     const criarUsuario = async () => {
+      errors.value = [];
       try {
         await store.dispatch('createUser', store.state.usuario);
         await store.dispatch('userLogin', store.state.usuario);
         await store.dispatch('getUsuario');
         router.push({ name: 'user' });
       } catch (error) {
-        console.log(error);
+        errors.value.push(error.value.response.data.message);
       }
     };
 
     return {
       criar,
       criarUsuario,
+      errors,
     };
   },
 };

@@ -1,6 +1,7 @@
 <template>
   <section>
     <h2>Endereço de Envio</h2>
+    <ErrorNotification :errors="errors" />
     <UserForm>
       <button class="btn" @click.prevent="finalizarCompra">
         Finalizar Compra
@@ -15,6 +16,7 @@ import { computed, ref } from 'vue';
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
 import { api } from '@/services';
+import ErrorNotification from './ErrorNotification.vue';
 
 export default {
   name: 'FinalizePurchase',
@@ -23,6 +25,7 @@ export default {
   },
   components: {
     UserForm,
+    ErrorNotification,
   },
 
   setup(props) {
@@ -30,6 +33,7 @@ export default {
     const router = useRouter();
 
     const usuario = ref(store.state.usuario);
+    const errors = ref([]);
 
     const compra = computed(() => {
       return {
@@ -60,17 +64,19 @@ export default {
         await store.dispatch('getUsuario');
         await criarTransacao();
       } catch (error) {
-        console.log(error);
+        errors.value.push(error.response.data.message);
       }
     };
 
     const finalizarCompra = () => {
+      errors.value = [];
       if (store.state.login) criarTransacao();
       else criarUsuario();
     };
 
     return {
       finalizarCompra,
+      errors,
     };
   },
 };
